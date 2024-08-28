@@ -71,6 +71,7 @@ var functionNames = []string{
 	"FanWeieoffice10_SensitiveInformationDisclosure",
 	"YongYouNCFileUpload",
 	"CVE-2024-7928",
+	"CVE-2024-7954",
 }
 
 var Attack bool
@@ -150,6 +151,7 @@ var cveFunctionMap = map[string]func(string, bool) error{
 	"FanWeieoffice10_SensitiveInformationDisclosure": CVEs.FanWeieoffice10_SensitiveInformationDisclosure,
 	"YongYouNCFileUpload":                            CVEs.YongYouNCFileUpload,
 	"CVE-2024-7928":                                  CVEs.CVE_2024_7928,
+	"CVE-2024-7954":                                  CVEs.CVE_2024_7954,
 }
 
 func main() {
@@ -159,6 +161,7 @@ func main() {
 	AttckFlag := flag.Bool("attack", false, "是否加入攻击参数")
 	CVEFlag := flag.String("cve", "", "指定CVE名称")
 	CookieFlag := flag.String("cookie", "", "设置cookie")
+
 	flag.Parse()
 
 	Attack = *AttckFlag
