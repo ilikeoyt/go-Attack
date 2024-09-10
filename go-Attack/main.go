@@ -72,6 +72,8 @@ var functionNames = []string{
 	"YongYouNCFileUpload",
 	"CVE-2024-7928",
 	"CVE-2024-7954",
+	"CVE-2020-9496",
+	"CVE-2023-49070",
 }
 
 var Attack bool
@@ -152,6 +154,8 @@ var cveFunctionMap = map[string]func(string, bool) error{
 	"YongYouNCFileUpload":                            CVEs.YongYouNCFileUpload,
 	"CVE-2024-7928":                                  CVEs.CVE_2024_7928,
 	"CVE-2024-7954":                                  CVEs.CVE_2024_7954,
+	"CVE-2020-9496":                                  CVEs.CVE_2020_9496,
+	"CVE-2023-49070":                                 CVEs.CVE_2023_49070,
 }
 
 func main() {
