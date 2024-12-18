@@ -74,6 +74,7 @@ var functionNames = []string{
 	"CVE-2024-7954",
 	"CVE-2020-9496",
 	"CVE-2023-49070",
+	"CVE-2023-50164",
 }
 
 var Attack bool
@@ -156,6 +157,7 @@ var cveFunctionMap = map[string]func(string, bool) error{
 	"CVE-2024-7954":                                  CVEs.CVE_2024_7954,
 	"CVE-2020-9496":                                  CVEs.CVE_2020_9496,
 	"CVE-2023-49070":                                 CVEs.CVE_2023_49070,
+	"CVE-2023-50164":                                 CVEs.CVE_2023_50164,
 }
 
 func main() {
