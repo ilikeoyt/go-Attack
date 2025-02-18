@@ -74,6 +74,9 @@ go build -o go-Attack main.go
 
 # 回显攻击payload
 ./go-Attack -u http://example.com -attack
+
+# 添加代理
+./go-Attack -u http://example.com -proxy http://proxy.com
 ```
 
 ## 配置说明
