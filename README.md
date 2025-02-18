@@ -1,10 +1,9 @@
 # go-attack-new
 ## 前言
-对之前的go-Attack进行了重构.....
-可能有些地方没有考虑到，欢迎师傅们提出宝贵issue！
+go-attack-new 是对之前的 go-Attack 进行重构后的项目，旨在提供一个强大且高效的安全测试与漏洞扫描工具。可能有些地方尚未考虑周全，欢迎各位师傅提出宝贵的 issue，帮助我们不断完善这个项目。
 
 ## 简介
-安全测试与漏洞扫描工具，提供高效的并发负载和多种漏洞检测能力
+go-attack-new 是一款安全测试与漏洞扫描工具，具备高效的并发负载和多种漏洞检测能力。它能帮助安全研究人员、渗透测试人员等快速发现目标系统中可能存在的安全漏洞。
 
 ## 功能特性
 
@@ -68,10 +67,10 @@ go build -o attack-tool main.go
 ./attack-tool -u http://example.com -poc CVE-2023-50164
 
 # 批量扫描目标
-./attack-tool -f url.txt -threads 50
+./attack-tool -f url.txt
 
-# 查看帮助信息
-./attack-tool -h
+# 查看支持POC列表
+./attack-tool -show
 ```
 
 ## 配置说明
@@ -85,7 +84,7 @@ requests:
     httpMethod: "POST"       # HTTP方法 (GET/POST/PUT/DELETE)
     headers:                 # 自定义请求头
       Content-Type: "application/json"
-    data: "{\"test\":\"{{randomString}}\"}" # 请求体，支持模板变量
+    data: "{\"test\":\"${{randomString}}\"}" # 请求体，支持模板变量
 
 # 响应匹配规则
 match:
@@ -109,10 +108,10 @@ attack:
 
 # 参数生成配置
 param:
-  - randomString: 12  # 生成随机字符串长度 (默认: 8)
-  - randomNumber: 6   # 生成随机数字位数 (默认: 4)
+  - randomString: 12  # 生成随机字符串长度
+  - randomNumber: 6   # 生成随机数字位数
 
-# 头部匹配配置
+# 响应体头部匹配配置
 matchHeaders:
   - matchOnlyHeaders: "X-Forwarded-For" # 指定匹配的Header
     matchHeaderStrings: 
@@ -125,3 +124,6 @@ matchHeaders:
 2. Fork仓库并创建特性分支
 3. 提交Pull Request时关联相关Issue
 4. 遵循现有代码风格和测试规范
+
+## 免责声明
+本工具仅用于安全研究和教学目的，请勿用于非法活动。使用本工具所产生的一切法律后果由使用者自行承担。
