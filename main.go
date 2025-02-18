@@ -28,12 +28,15 @@ func main() {
 	ShowFlag := flag.Bool("show", false, "展示所有支持漏洞")
 	AttackFlag := flag.Bool("attack", false, "是否加入攻击参数")
 	VulnFlag := flag.String("vuln", "", "指定漏洞名称")
+	// 新增 -proxy 参数
+	ProxyFlag := flag.String("proxy", "", "指定代理地址，格式为 http://host:port")
 
 	flag.Parse()
 
 	Show := *ShowFlag
 	Vuln := *VulnFlag
 	attackFlag := *AttackFlag
+	proxy := *ProxyFlag // 获取用户指定的代理地址
 	var validUrls []string
 
 	PocPath := "POCs" // 这里的路径可以根据需要更改
@@ -68,7 +71,7 @@ func main() {
 		}
 
 		wg.Add(1)
-		go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, &wg)
+		go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, &wg)
 
 		// 等待所有 goroutine 完成
 		wg.Wait()
@@ -86,7 +89,7 @@ func main() {
 		// 对每个 URL 启动一个 goroutine 进行扫描
 		for _, url := range validUrls {
 			wg.Add(1)
-			go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, &wg)
+			go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, &wg)
 		}
 
 		// 等待所有 goroutine 完成
