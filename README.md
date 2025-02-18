@@ -58,19 +58,22 @@ cd go-attack-new
 go mod download
 
 # 编译项目
-go build -o attack-tool main.go
+go build -o go-Attack main.go
 ```
 
 ### 基本使用
 ```bash
 # 扫描单个目标
-./attack-tool -u http://example.com -poc CVE-2023-50164
+./go-Attack -u http://example.com -vuln CVE-2023-50164
 
 # 批量扫描目标
-./attack-tool -f url.txt
+./go-Attack -f url.txt
 
 # 查看支持POC列表
-./attack-tool -show
+./go-Attack -show
+
+# 回显攻击payload
+./go-Attack -u http://example.com -attack
 ```
 
 ## 配置说明
