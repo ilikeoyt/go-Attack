@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func FinalReq(ReqUrl string, attackFlag bool, filename string) error {
+func FinalReq(ReqUrl string, attackFlag bool, filename string, proxy string) error {
 	var matchType string
 	var ReqPath string
 	var Timeout int
@@ -28,9 +28,14 @@ func FinalReq(ReqUrl string, attackFlag bool, filename string) error {
 	var rspHeaders http.Header
 	var rspTime time.Duration
 
-	proxyURL, err5 := url.Parse("http://127.0.0.1:8080")
-	if err5 != nil {
-		return err5
+	var proxyURL *url.URL
+	var err5 error
+	if proxy != "" {
+		// 解析用户指定的代理地址
+		proxyURL, err5 = url.Parse(proxy)
+		if err5 != nil {
+			return err5
+		}
 	}
 	config, err1 := ConLoad.LoadConfig(filename)
 	if err1 != nil {
@@ -83,7 +88,10 @@ func FinalReq(ReqUrl string, attackFlag bool, filename string) error {
 		CompleteUrl := ReqUrl + ReqPath
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyURL(proxyURL),
+		}
+
+		if proxyURL != nil {
+			tr.Proxy = http.ProxyURL(proxyURL) // 使用用户指定的代理
 		}
 
 		client := &http.Client{
