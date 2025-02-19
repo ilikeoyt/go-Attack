@@ -181,3 +181,50 @@ func FinalReq(ReqUrl string, attackFlag bool, filename string, proxy string) err
 
 	return nil
 }
+
+// NormalReq 函数用于发送普通的 GET 请求
+func NormalReq(ReqUrl string, proxy string) (*http.Response, []byte, error) {
+	var proxyURL *url.URL
+	var err5 error
+	if proxy != "" {
+		// 解析用户指定的代理地址
+		proxyURL, err5 = url.Parse(proxy)
+		if err5 != nil {
+			return nil, nil, err5
+		}
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	if proxyURL != nil {
+		tr.Proxy = http.ProxyURL(proxyURL) // 使用用户指定的代理
+	}
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Transport: tr,
+		Timeout:   10 * time.Second,
+	}
+
+	request, err2 := http.NewRequest("GET", ReqUrl, nil)
+	if err2 != nil {
+		return nil, nil, err2
+	}
+
+	response, err3 := client.Do(request)
+	if err3 != nil {
+		return nil, nil, err3
+	}
+	defer response.Body.Close()
+
+	body, err4 := io.ReadAll(response.Body)
+	if err4 != nil {
+		return nil, nil, err4
+	}
+
+	return response, body, nil
+}
