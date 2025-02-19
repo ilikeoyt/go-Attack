@@ -70,8 +70,16 @@ func main() {
 			url = "http://" + url
 		}
 
+		// 先发送请求获取响应，判断是否为动态页面
+		resp, body, err := request.NormalReq(url, proxy)
+		if err != nil {
+			fmt.Printf("请求出错: %v\n", err)
+			return
+		}
+		isDynamic := tools.IsDynamicPage(resp, string(body))
+
 		wg.Add(1)
-		go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, &wg)
+		go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, isDynamic, &wg)
 
 		// 等待所有 goroutine 完成
 		wg.Wait()
@@ -88,8 +96,20 @@ func main() {
 
 		// 对每个 URL 启动一个 goroutine 进行扫描
 		for _, url := range validUrls {
+			// 先发送请求获取响应
+			//isDynamic := tools.IsDynamicPage(url)
+
 			wg.Add(1)
-			go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, &wg)
+
+			// 先发送请求获取响应，判断是否为动态页面
+			resp, body, err := request.NormalReq(url, proxy)
+			if err != nil {
+				fmt.Printf("请求出错: %v\n", err)
+				return
+			}
+			isDynamic := tools.IsDynamicPage(resp, string(body))
+
+			go request.ScanURL(url, attackFlag, fileNames, PocPath, Vuln, proxy, isDynamic, &wg)
 		}
 
 		// 等待所有 goroutine 完成
