@@ -5,11 +5,28 @@ import (
 	"sync"
 )
 
-func ScanURL(url string, attackFlag bool, fileNames []string, PocPath string, Vuln string, proxy string, wg *sync.WaitGroup) {
+func ScanURL(url string, attackFlag bool, fileNames []string, PocPath string, Vuln string, proxy string, dynamic bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	errorLogger := ConLoad.CreateErrorLog()
-	defer ConLoad.CloseLogFile() // 确保程序退出时关闭日志文件
+	defer ConLoad.CloseLogFile()
+
+	// 动态渲染预处理
+	if dynamic {
+		browser, err := NewBrowser()
+		if err != nil {
+			errorLogger.Printf("Failed to init browser for %s: %v", url, err)
+			return
+		}
+		defer browser.cancel()
+		
+		dom, requests, err := browser.RenderFullDOM(url)
+		if err == nil {
+			// 将动态内容转换为静态请求
+			url = processDynamicContent(dom, requests)
+		}
+	}
+	
 	// 遍历每个 POC 文件
 	if Vuln == "" {
 		for _, fileName := range fileNames {
